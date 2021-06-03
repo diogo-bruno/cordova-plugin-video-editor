@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-video-editor" version="1.1.3" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<plugin id="diogo-cordova-plugin-video-editor" version="0.0.11"
+    xmlns="http://apache.org/cordova/ns/plugins/1.0" 
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <name>VideoEditor</name>
     <description>A plugin to assist in video editing tasks</description>
     <keywords>cordova,video,editing,transcoding,encoding</keywords>
@@ -31,7 +33,37 @@
         <source-file src="src/android/VideoEditor.java" target-dir="src/org/apache/cordova/videoeditor" />
         <source-file src="src/android/CustomAndroidFormatStrategy.java" target-dir="src/org/apache/cordova/videoeditor" />
 
-        <framework src="src/android/build.gradle" custom="true" type="gradleReference" />
+        <!-- compat -->
+        <source-file src="src/android/androidtranscoder/compat/MediaCodecListCompat.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/compat" />
+
+        <!-- engine -->
+        <source-file src="src/android/androidtranscoder/engine/InputSurface.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/engine" />
+        <source-file src="src/android/androidtranscoder/engine/InvalidOutputFormatException.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/engine" />
+        <source-file src="src/android/androidtranscoder/engine/MediaFormatValidator.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/engine" />
+        <source-file src="src/android/androidtranscoder/engine/MediaTranscoderEngine.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/engine" />
+        <source-file src="src/android/androidtranscoder/engine/OutputSurface.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/engine" />
+        <source-file src="src/android/androidtranscoder/engine/PassThroughTrackTranscoder.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/engine" />
+        <source-file src="src/android/androidtranscoder/engine/QueuedMuxer.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/engine" />
+        <source-file src="src/android/androidtranscoder/engine/TextureRender.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/engine" />
+        <source-file src="src/android/androidtranscoder/engine/TrackTranscoder.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/engine" />
+        <source-file src="src/android/androidtranscoder/engine/VideoTrackTranscoder.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/engine" />
+
+        <!-- format -->
+        <source-file src="src/android/androidtranscoder/format/Android16By9FormatStrategy.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/format" />
+        <source-file src="src/android/androidtranscoder/format/Android720pFormatStrategy.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/format" />
+        <source-file src="src/android/androidtranscoder/format/ExportPreset960x540Strategy.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/format" />
+        <source-file src="src/android/androidtranscoder/format/MediaFormatExtraConstants.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/format" />
+        <source-file src="src/android/androidtranscoder/format/MediaFormatPresets.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/format" />
+        <source-file src="src/android/androidtranscoder/format/MediaFormatStrategy.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/format" />
+        <source-file src="src/android/androidtranscoder/format/MediaFormatStrategyPresets.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/format" />
+        <source-file src="src/android/androidtranscoder/format/OutputFormatUnavailableException.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/format" />
+
+        <!-- utils -->
+        <source-file src="src/android/androidtranscoder/utils/AvcCsdUtils.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/utils" />
+        <source-file src="src/android/androidtranscoder/utils/AvcSpsUtils.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/utils" />
+        <source-file src="src/android/androidtranscoder/utils/MediaExtractorUtils.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/utils" />
+
+        <source-file src="src/android/androidtranscoder/MediaTranscoder.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder" />
 
     </platform>
 

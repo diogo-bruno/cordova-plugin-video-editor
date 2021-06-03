@@ -30,11 +30,10 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import net.ypresto.androidtranscoder.MediaTranscoder;
+import org.apache.cordova.videoeditor.androidtranscoder.MediaTranscoder;
 
 /**
- * VideoEditor plugin for Android
- * Created by Ross Martin 2-2-15
+ * VideoEditor plugin for Android Created by Ross Martin 2-2-15
  */
 public class VideoEditor extends CordovaPlugin {
 
@@ -79,21 +78,15 @@ public class VideoEditor extends CordovaPlugin {
      *
      * Transcodes a video
      *
-     * ARGUMENTS
-     * =========
+     * ARGUMENTS =========
      *
-     * fileUri              - path to input video
-     * outputFileName       - output file name
-     * saveToLibrary        - save to gallery
-     * deleteInputFile      - optionally remove input file
-     * width                - width for the output video
-     * height               - height for the output video
-     * fps                  - fps the video
-     * videoBitrate         - video bitrate for the output video in bits
-     * duration             - max video duration (in seconds?)
+     * fileUri - path to input video outputFileName - output file name saveToLibrary
+     * - save to gallery deleteInputFile - optionally remove input file width -
+     * width for the output video height - height for the output video fps - fps the
+     * video videoBitrate - video bitrate for the output video in bits duration -
+     * max video duration (in seconds?)
      *
-     * RESPONSE
-     * ========
+     * RESPONSE ========
      *
      * outputFilePath - path to output file
      *
@@ -114,10 +107,8 @@ public class VideoEditor extends CordovaPlugin {
         }
 
         final String videoSrcPath = inFile.getAbsolutePath();
-        final String outputFileName = options.optString(
-                "outputFileName",
-                new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(new Date())
-        );
+        final String outputFileName = options.optString("outputFileName",
+                new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(new Date()));
 
         final boolean deleteInputFile = options.optBoolean("deleteInputFile", false);
         final int width = options.optInt("width", 0);
@@ -145,12 +136,10 @@ public class VideoEditor extends CordovaPlugin {
         File mediaStorageDir;
 
         if (saveToLibrary) {
-            mediaStorageDir = new File(
-                    Environment.getExternalStorageDirectory() + "/Movies",
-                    appName
-            );
+            mediaStorageDir = new File(Environment.getExternalStorageDirectory() + "/Movies", appName);
         } else {
-            mediaStorageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/" + cordova.getActivity().getPackageName() + "/files/files/videos");
+            mediaStorageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/"
+                    + cordova.getActivity().getPackageName() + "/files/files/videos");
         }
 
         if (!mediaStorageDir.exists()) {
@@ -160,10 +149,8 @@ public class VideoEditor extends CordovaPlugin {
             }
         }
 
-        final String outputFilePath = new File(
-                mediaStorageDir.getPath(),
-                outputFileName + outputExtension
-        ).getAbsolutePath();
+        final String outputFilePath = new File(mediaStorageDir.getPath(), outputFileName + outputExtension)
+                .getAbsolutePath();
 
         Log.d(TAG, "outputFilePath: " + outputFilePath);
 
@@ -239,8 +226,8 @@ public class VideoEditor extends CordovaPlugin {
                     float videoWidth = Float.parseFloat(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
                     float videoHeight = Float.parseFloat(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
 
-                    MediaTranscoder.getInstance().transcodeVideo(fin.getFD(), outputFilePath,
-                            new CustomAndroidFormatStrategy(videoBitrate, fps, width, height), listener, videoDuration);
+                    //MediaTranscoder.getInstance().transcodeVideo(fin.getFD(), outputFilePath, new CustomAndroidFormatStrategy(videoBitrate, fps, width, height), listener, videoDuration);
+                    MediaTranscoder.getInstance().transcodeVideo(fin.getFD(), outputFilePath, new CustomAndroidFormatStrategy(videoBitrate, fps, width, height), listener);
 
                 } catch (Throwable e) {
                     Log.d(TAG, "transcode exception ", e);
@@ -256,17 +243,12 @@ public class VideoEditor extends CordovaPlugin {
      *
      * Creates a thumbnail from the start of a video.
      *
-     * ARGUMENTS
-     * =========
-     * fileUri        - input file path
-     * outputFileName - output file name
-     * atTime         - location in the video to create the thumbnail (in seconds)
-     * width          - width for the thumbnail (optional)
-     * height         - height for the thumbnail (optional)
-     * quality        - quality of the thumbnail (optional, between 1 and 100)
+     * ARGUMENTS ========= fileUri - input file path outputFileName - output file
+     * name atTime - location in the video to create the thumbnail (in seconds)
+     * width - width for the thumbnail (optional) height - height for the thumbnail
+     * (optional) quality - quality of the thumbnail (optional, between 1 and 100)
      *
-     * RESPONSE
-     * ========
+     * RESPONSE ========
      *
      * outputFilePath - path to output file
      *
@@ -275,7 +257,6 @@ public class VideoEditor extends CordovaPlugin {
      */
     private void createThumbnail(JSONArray args) throws JSONException, IOException {
         Log.d(TAG, "createThumbnail firing");
-
 
         JSONObject options = args.optJSONObject(0);
         Log.d(TAG, "options: " + options.toString());
@@ -292,10 +273,8 @@ public class VideoEditor extends CordovaPlugin {
             return;
         }
         final String srcVideoPath = inFile.getAbsolutePath();
-        String outputFileName = options.optString(
-                "outputFileName",
-                new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(new Date())
-        );
+        String outputFileName = options.optString("outputFileName",
+                new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(new Date()));
 
         final int quality = options.optInt("quality", 100);
         final int width = options.optInt("width", 0);
@@ -314,7 +293,8 @@ public class VideoEditor extends CordovaPlugin {
         }
         final String appName = (String) (ai != null ? pm.getApplicationLabel(ai) : "Unknown");
 
-        File externalFilesDir =  new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/" + cordova.getActivity().getPackageName() + "/files/files/videos");
+        File externalFilesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/"
+                + cordova.getActivity().getPackageName() + "/files/files/videos");
 
         if (!externalFilesDir.exists()) {
             if (!externalFilesDir.mkdirs()) {
@@ -323,10 +303,7 @@ public class VideoEditor extends CordovaPlugin {
             }
         }
 
-        final File outputFile =  new File(
-                externalFilesDir.getPath(),
-                outputFileName + ".jpg"
-        );
+        final File outputFile = new File(externalFilesDir.getPath(), outputFileName + ".jpg");
         final String outputFilePath = outputFile.getAbsolutePath();
 
         // start task
@@ -388,20 +365,16 @@ public class VideoEditor extends CordovaPlugin {
      *
      * Gets info on a video
      *
-     * ARGUMENTS
-     * =========
+     * ARGUMENTS =========
      *
-     * fileUri:      - path to input video
+     * fileUri: - path to input video
      *
-     * RESPONSE
-     * ========
+     * RESPONSE ========
      *
-     * width         - width of the video
-     * height        - height of the video
-     * orientation   - orientation of the video
-     * duration      - duration of the video (in seconds)
-     * size          - size of the video (in bytes)
-     * bitrate       - bitrate of the video (in bits per second)
+     * width - width of the video height - height of the video orientation -
+     * orientation of the video duration - duration of the video (in seconds) size -
+     * size of the video (in bytes) bitrate - bitrate of the video (in bits per
+     * second)
      *
      * @param JSONArray args
      * @return void
@@ -449,7 +422,8 @@ public class VideoEditor extends CordovaPlugin {
             orientation = (videoWidth < videoHeight) ? "portrait" : "landscape";
         }
 
-        double duration = Double.parseDouble(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) / 1000.0;
+        double duration = Double.parseDouble(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))
+                / 1000.0;
         long bitrate = Long.parseLong(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
 
         JSONObject response = new JSONObject();
@@ -462,7 +436,6 @@ public class VideoEditor extends CordovaPlugin {
 
         callback.success(response);
     }
-
 
     @SuppressWarnings("deprecation")
     private File resolveLocalFileSystemURI(String url) throws IOException, JSONException {
@@ -493,7 +466,7 @@ public class VideoEditor extends CordovaPlugin {
         }
 
         if (!fp.exists()) {
-            throw new FileNotFoundException( "" + url + " -> " + fp.getCanonicalPath());
+            throw new FileNotFoundException("" + url + " -> " + fp.getCanonicalPath());
         }
         if (!fp.canRead()) {
             throw new IOException("can't read file: " + url + " -> " + fp.getCanonicalPath());
@@ -503,11 +476,11 @@ public class VideoEditor extends CordovaPlugin {
 
     /**
      * Get a file path from a Uri. This will get the the path for Storage Access
-     * Framework Documents, as well as the _data field for the MediaStore and
-     * other file-based ContentProviders.
+     * Framework Documents, as well as the _data field for the MediaStore and other
+     * file-based ContentProviders.
      *
      * @param context The context.
-     * @param uri The Uri to query.
+     * @param uri     The Uri to query.
      * @author paulburke
      */
     public static String getPath(final Context context, final Uri uri) {
@@ -532,8 +505,8 @@ public class VideoEditor extends CordovaPlugin {
             else if (isDownloadsDocument(uri)) {
 
                 final String id = DocumentsContract.getDocumentId(uri);
-                final Uri contentUri = ContentUris.withAppendedId(
-                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+                final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),
+                        Long.valueOf(id));
 
                 return getDataColumn(context, contentUri, null, null);
             }
@@ -553,9 +526,7 @@ public class VideoEditor extends CordovaPlugin {
                 }
 
                 final String selection = "_id=?";
-                final String[] selectionArgs = new String[] {
-                        split[1]
-                };
+                final String[] selectionArgs = new String[] { split[1] };
 
                 return getDataColumn(context, contentUri, selection, selectionArgs);
             }
@@ -573,27 +544,23 @@ public class VideoEditor extends CordovaPlugin {
     }
 
     /**
-     * Get the value of the data column for this Uri. This is useful for
-     * MediaStore Uris, and other file-based ContentProviders.
+     * Get the value of the data column for this Uri. This is useful for MediaStore
+     * Uris, and other file-based ContentProviders.
      *
-     * @param context The context.
-     * @param uri The Uri to query.
-     * @param selection (Optional) Filter used in the query.
+     * @param context       The context.
+     * @param uri           The Uri to query.
+     * @param selection     (Optional) Filter used in the query.
      * @param selectionArgs (Optional) Selection arguments used in the query.
      * @return The value of the _data column, which is typically a file path.
      */
-    public static String getDataColumn(Context context, Uri uri, String selection,
-                                       String[] selectionArgs) {
+    public static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
 
         Cursor cursor = null;
         final String column = "_data";
-        final String[] projection = {
-                column
-        };
+        final String[] projection = { column };
 
         try {
-            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
-                    null);
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
             if (cursor != null && cursor.moveToFirst()) {
                 final int column_index = cursor.getColumnIndexOrThrow(column);
                 return cursor.getString(column_index);
@@ -604,7 +571,6 @@ public class VideoEditor extends CordovaPlugin {
         }
         return null;
     }
-
 
     /**
      * @param uri The Uri to check.
