@@ -35,6 +35,7 @@
 
         <!-- compat -->
         <source-file src="src/android/androidtranscoder/compat/MediaCodecListCompat.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/compat" />
+        <source-file src="src/android/androidtranscoder/compat/MediaCodecBufferCompatWrapper.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/compat" />
 
         <!-- engine -->
         <source-file src="src/android/androidtranscoder/engine/InputSurface.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/engine" />
@@ -47,6 +48,10 @@
         <source-file src="src/android/androidtranscoder/engine/TextureRender.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/engine" />
         <source-file src="src/android/androidtranscoder/engine/TrackTranscoder.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/engine" />
         <source-file src="src/android/androidtranscoder/engine/VideoTrackTranscoder.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/engine" />
+        
+        <source-file src="src/android/androidtranscoder/engine/AudioChannel.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/engine" />
+        <source-file src="src/android/androidtranscoder/engine/AudioRemixer.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/engine" />
+        <source-file src="src/android/androidtranscoder/engine/AudioTrackTranscoder.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/engine" />
 
         <!-- format -->
         <source-file src="src/android/androidtranscoder/format/Android16By9FormatStrategy.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/format" />
@@ -62,6 +67,7 @@
         <source-file src="src/android/androidtranscoder/utils/AvcCsdUtils.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/utils" />
         <source-file src="src/android/androidtranscoder/utils/AvcSpsUtils.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/utils" />
         <source-file src="src/android/androidtranscoder/utils/MediaExtractorUtils.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/utils" />
+        <source-file src="src/android/androidtranscoder/utils/ISO6709LocationParser.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder/utils" />
 
         <source-file src="src/android/androidtranscoder/MediaTranscoder.java" target-dir="src/org/apache/cordova/videoeditor/androidtranscoder" />
 

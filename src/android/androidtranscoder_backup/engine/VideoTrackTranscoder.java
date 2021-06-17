@@ -50,8 +50,7 @@ public class VideoTrackTranscoder implements TrackTranscoder {
     private boolean mEncoderStarted;
     private long mWrittenPresentationTimeUs;
 
-    public VideoTrackTranscoder(MediaExtractor extractor, int trackIndex,
-                                MediaFormat outputFormat, QueuedMuxer muxer) {
+    public VideoTrackTranscoder(MediaExtractor extractor, int trackIndex, MediaFormat outputFormat, QueuedMuxer muxer) {
         mExtractor = extractor;
         mTrackIndex = trackIndex;
         mOutputFormat = outputFormat;
@@ -77,7 +76,8 @@ public class VideoTrackTranscoder implements TrackTranscoder {
         if (inputFormat.containsKey(MediaFormatExtraConstants.KEY_ROTATION_DEGREES)) {
             // Decoded video is rotated automatically in Android 5.0 lollipop.
             // Turn off here because we don't want to encode rotated one.
-            // refer: https://android.googlesource.com/platform/frameworks/av/+blame/lollipop-release/media/libstagefright/Utils.cpp
+            // refer:
+            // https://android.googlesource.com/platform/frameworks/av/+blame/lollipop-release/media/libstagefright/Utils.cpp
             inputFormat.setInteger(MediaFormatExtraConstants.KEY_ROTATION_DEGREES, 0);
         }
         mDecoderOutputSurfaceWrapper = new OutputSurface();
@@ -102,13 +102,16 @@ public class VideoTrackTranscoder implements TrackTranscoder {
         boolean busy = false;
 
         int status;
-        while (drainEncoder(0) != DRAIN_STATE_NONE) busy = true;
+        while (drainEncoder(0) != DRAIN_STATE_NONE)
+            busy = true;
         do {
             status = drainDecoder(0);
-            if (status != DRAIN_STATE_NONE) busy = true;
+            if (status != DRAIN_STATE_NONE)
+                busy = true;
             // NOTE: not repeating to keep from deadlock when encoder is full.
         } while (status == DRAIN_STATE_SHOULD_RETRY_IMMEDIATELY);
-        while (drainExtractor(0) != DRAIN_STATE_NONE) busy = true;
+        while (drainExtractor(0) != DRAIN_STATE_NONE)
+            busy = true;
 
         return busy;
     }
@@ -135,25 +138,29 @@ public class VideoTrackTranscoder implements TrackTranscoder {
             mEncoderInputSurfaceWrapper = null;
         }
         if (mDecoder != null) {
-            if (mDecoderStarted) mDecoder.stop();
+            if (mDecoderStarted)
+                mDecoder.stop();
             mDecoder.release();
             mDecoder = null;
         }
         if (mEncoder != null) {
-            if (mEncoderStarted) mEncoder.stop();
+            if (mEncoderStarted)
+                mEncoder.stop();
             mEncoder.release();
             mEncoder = null;
         }
     }
 
     private int drainExtractor(long timeoutUs) {
-        if (mIsExtractorEOS) return DRAIN_STATE_NONE;
+        if (mIsExtractorEOS)
+            return DRAIN_STATE_NONE;
         int trackIndex = mExtractor.getSampleTrackIndex();
         if (trackIndex >= 0 && trackIndex != mTrackIndex) {
             return DRAIN_STATE_NONE;
         }
         int result = mDecoder.dequeueInputBuffer(timeoutUs);
-        if (result < 0) return DRAIN_STATE_NONE;
+        if (result < 0)
+            return DRAIN_STATE_NONE;
         if (trackIndex < 0) {
             mIsExtractorEOS = true;
             mDecoder.queueInputBuffer(result, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
@@ -161,20 +168,22 @@ public class VideoTrackTranscoder implements TrackTranscoder {
         }
         int sampleSize = mExtractor.readSampleData(mDecoderInputBuffers[result], 0);
         boolean isKeyFrame = (mExtractor.getSampleFlags() & MediaExtractor.SAMPLE_FLAG_SYNC) != 0;
-        mDecoder.queueInputBuffer(result, 0, sampleSize, mExtractor.getSampleTime(), isKeyFrame ? MediaCodec.BUFFER_FLAG_SYNC_FRAME : 0);
+        mDecoder.queueInputBuffer(result, 0, sampleSize, mExtractor.getSampleTime(),
+                isKeyFrame ? MediaCodec.BUFFER_FLAG_SYNC_FRAME : 0);
         mExtractor.advance();
         return DRAIN_STATE_CONSUMED;
     }
 
     private int drainDecoder(long timeoutUs) {
-        if (mIsDecoderEOS) return DRAIN_STATE_NONE;
+        if (mIsDecoderEOS)
+            return DRAIN_STATE_NONE;
         int result = mDecoder.dequeueOutputBuffer(mBufferInfo, timeoutUs);
         switch (result) {
-            case MediaCodec.INFO_TRY_AGAIN_LATER:
-                return DRAIN_STATE_NONE;
-            case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
-            case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
-                return DRAIN_STATE_SHOULD_RETRY_IMMEDIATELY;
+        case MediaCodec.INFO_TRY_AGAIN_LATER:
+            return DRAIN_STATE_NONE;
+        case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+        case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
+            return DRAIN_STATE_SHOULD_RETRY_IMMEDIATELY;
         }
         if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
             mEncoder.signalEndOfInputStream();
@@ -195,20 +204,21 @@ public class VideoTrackTranscoder implements TrackTranscoder {
     }
 
     private int drainEncoder(long timeoutUs) {
-        if (mIsEncoderEOS) return DRAIN_STATE_NONE;
+        if (mIsEncoderEOS)
+            return DRAIN_STATE_NONE;
         int result = mEncoder.dequeueOutputBuffer(mBufferInfo, timeoutUs);
         switch (result) {
-            case MediaCodec.INFO_TRY_AGAIN_LATER:
-                return DRAIN_STATE_NONE;
-            case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
-                if (mActualOutputFormat != null)
-                    throw new RuntimeException("Video output format changed twice.");
-                mActualOutputFormat = mEncoder.getOutputFormat();
-                mMuxer.setOutputFormat(QueuedMuxer.SampleType.VIDEO, mActualOutputFormat);
-                return DRAIN_STATE_SHOULD_RETRY_IMMEDIATELY;
-            case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
-                mEncoderOutputBuffers = mEncoder.getOutputBuffers();
-                return DRAIN_STATE_SHOULD_RETRY_IMMEDIATELY;
+        case MediaCodec.INFO_TRY_AGAIN_LATER:
+            return DRAIN_STATE_NONE;
+        case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+            if (mActualOutputFormat != null)
+                throw new RuntimeException("Video output format changed twice.");
+            mActualOutputFormat = mEncoder.getOutputFormat();
+            mMuxer.setOutputFormat(QueuedMuxer.SampleType.VIDEO, mActualOutputFormat);
+            return DRAIN_STATE_SHOULD_RETRY_IMMEDIATELY;
+        case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
+            mEncoderOutputBuffers = mEncoder.getOutputBuffers();
+            return DRAIN_STATE_SHOULD_RETRY_IMMEDIATELY;
         }
         if (mActualOutputFormat == null) {
             throw new RuntimeException("Could not determine actual output format.");

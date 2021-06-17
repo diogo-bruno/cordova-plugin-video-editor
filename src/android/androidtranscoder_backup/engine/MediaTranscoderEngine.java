@@ -19,12 +19,9 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaMuxer;
-import android.os.Build;
 import android.util.Log;
 
-import org.apache.cordova.videoeditor.androidtranscoder.BuildConfig;
 import org.apache.cordova.videoeditor.androidtranscoder.format.MediaFormatStrategy;
-import org.apache.cordova.videoeditor.androidtranscoder.utils.ISO6709LocationParser;
 import org.apache.cordova.videoeditor.androidtranscoder.utils.MediaExtractorUtils;
 
 import java.io.FileDescriptor;
@@ -74,16 +71,18 @@ public class MediaTranscoderEngine {
     }
 
     /**
-     * Run video transcoding. Blocks current thread.
-     * Audio data will not be transcoded; original stream will be wrote to output file.
+     * Run video transcoding. Blocks current thread. Audio data will not be
+     * transcoded; original stream will be wrote to output file.
      *
      * @param outputPath     File path to output transcoded video file.
      * @param formatStrategy Output format strategy.
-     * @throws IOException                  when input or output file could not be opened.
+     * @throws IOException                  when input or output file could not be
+     *                                      opened.
      * @throws InvalidOutputFormatException when output format is not supported.
      * @throws InterruptedException         when cancel to transcode.
      */
-    public void transcodeVideo(String outputPath, MediaFormatStrategy formatStrategy) throws IOException, InterruptedException {
+    public void transcodeVideo(String outputPath, MediaFormatStrategy formatStrategy)
+            throws IOException, InterruptedException {
         if (outputPath == null) {
             throw new NullPointerException("Output path cannot be null.");
         }
@@ -115,7 +114,7 @@ public class MediaTranscoderEngine {
                 }
             } catch (RuntimeException e) {
                 // Too fatal to make alive the app, because it may leak native resources.
-                //noinspection ThrowFromFinallyBlock
+                // noinspection ThrowFromFinallyBlock
                 throw new Error("Could not shutdown extractor, codecs and muxer pipeline.", e);
             }
             try {
@@ -133,27 +132,22 @@ public class MediaTranscoderEngine {
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         mediaMetadataRetriever.setDataSource(mInputFileDescriptor);
 
-        String rotationString = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
+        String rotationString = mediaMetadataRetriever
+                .extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
         try {
             mMuxer.setOrientationHint(Integer.parseInt(rotationString));
         } catch (NumberFormatException e) {
             // skip
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            String locationString = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
-            if (locationString != null) {
-                float[] location = new ISO6709LocationParser().parse(locationString);
-                if (location != null) {
-                    mMuxer.setLocation(location[0], location[1]);
-                } else {
-                    Log.d(TAG, "Failed to parse the location metadata: " + locationString);
-                }
-            }
-        }
+        // TODO: parse ISO 6709
+        // String locationString =
+        // mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
+        // mMuxer.setLocation(Integer.getInteger(rotationString, 0));
 
         try {
-            mDurationUs = Long.parseLong(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) * 1000;
+            mDurationUs = Long.parseLong(
+                    mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) * 1000;
         } catch (NumberFormatException e) {
             mDurationUs = -1;
         }
@@ -165,7 +159,8 @@ public class MediaTranscoderEngine {
         MediaFormat videoOutputFormat = formatStrategy.createVideoOutputFormat(trackResult.mVideoTrackFormat);
         MediaFormat audioOutputFormat = formatStrategy.createAudioOutputFormat(trackResult.mAudioTrackFormat);
         if (videoOutputFormat == null && audioOutputFormat == null) {
-            throw new InvalidOutputFormatException("MediaFormatStrategy returned pass-through for both video and audio. No transcoding is necessary.");
+            throw new InvalidOutputFormatException(
+                    "MediaFormatStrategy returned pass-through for both video and audio. No transcoding is necessary.");
         }
         QueuedMuxer queuedMuxer = new QueuedMuxer(mMuxer, new QueuedMuxer.Listener() {
             @Override
@@ -176,41 +171,51 @@ public class MediaTranscoderEngine {
         });
 
         if (videoOutputFormat == null) {
-            mVideoTrackTranscoder = new PassThroughTrackTranscoder(mExtractor, trackResult.mVideoTrackIndex, queuedMuxer, QueuedMuxer.SampleType.VIDEO);
+            mVideoTrackTranscoder = new PassThroughTrackTranscoder(mExtractor, trackResult.mVideoTrackIndex,
+                    queuedMuxer, QueuedMuxer.SampleType.VIDEO);
         } else {
-            mVideoTrackTranscoder = new VideoTrackTranscoder(mExtractor, trackResult.mVideoTrackIndex, videoOutputFormat, queuedMuxer);
+            mVideoTrackTranscoder = new VideoTrackTranscoder(mExtractor, trackResult.mVideoTrackIndex,
+                    videoOutputFormat, queuedMuxer);
         }
         mVideoTrackTranscoder.setup();
         if (audioOutputFormat == null) {
-            mAudioTrackTranscoder = new PassThroughTrackTranscoder(mExtractor, trackResult.mAudioTrackIndex, queuedMuxer, QueuedMuxer.SampleType.AUDIO);
+            mAudioTrackTranscoder = new PassThroughTrackTranscoder(mExtractor, trackResult.mAudioTrackIndex,
+                    queuedMuxer, QueuedMuxer.SampleType.AUDIO);
         } else {
-            mAudioTrackTranscoder = new AudioTrackTranscoder(mExtractor, trackResult.mAudioTrackIndex, audioOutputFormat, queuedMuxer);
+            throw new UnsupportedOperationException("Transcoding audio tracks currently not supported.");
         }
         mAudioTrackTranscoder.setup();
         mExtractor.selectTrack(trackResult.mVideoTrackIndex);
         mExtractor.selectTrack(trackResult.mAudioTrackIndex);
     }
 
-    private void runPipelines() throws InterruptedException {
+    private void runPipelines() {
         long loopCount = 0;
         if (mDurationUs <= 0) {
             double progress = PROGRESS_UNKNOWN;
             mProgress = progress;
-            if (mProgressCallback != null) mProgressCallback.onProgress(progress); // unknown
+            if (mProgressCallback != null)
+                mProgressCallback.onProgress(progress); // unknown
         }
         while (!(mVideoTrackTranscoder.isFinished() && mAudioTrackTranscoder.isFinished())) {
-            boolean stepped = mVideoTrackTranscoder.stepPipeline()
-                    || mAudioTrackTranscoder.stepPipeline();
+            boolean stepped = mVideoTrackTranscoder.stepPipeline() || mAudioTrackTranscoder.stepPipeline();
             loopCount++;
             if (mDurationUs > 0 && loopCount % PROGRESS_INTERVAL_STEPS == 0) {
-                double videoProgress = mVideoTrackTranscoder.isFinished() ? 1.0 : Math.min(1.0, (double) mVideoTrackTranscoder.getWrittenPresentationTimeUs() / mDurationUs);
-                double audioProgress = mAudioTrackTranscoder.isFinished() ? 1.0 : Math.min(1.0, (double) mAudioTrackTranscoder.getWrittenPresentationTimeUs() / mDurationUs);
+                double videoProgress = mVideoTrackTranscoder.isFinished() ? 1.0
+                        : Math.min(1.0, (double) mVideoTrackTranscoder.getWrittenPresentationTimeUs() / mDurationUs);
+                double audioProgress = mAudioTrackTranscoder.isFinished() ? 1.0
+                        : Math.min(1.0, (double) mAudioTrackTranscoder.getWrittenPresentationTimeUs() / mDurationUs);
                 double progress = (videoProgress + audioProgress) / 2.0;
                 mProgress = progress;
-                if (mProgressCallback != null) mProgressCallback.onProgress(progress);
+                if (mProgressCallback != null)
+                    mProgressCallback.onProgress(progress);
             }
             if (!stepped) {
-                Thread.sleep(SLEEP_TO_WAIT_TRACK_TRANSCODERS);
+                try {
+                    Thread.sleep(SLEEP_TO_WAIT_TRACK_TRANSCODERS);
+                } catch (InterruptedException e) {
+                    // nothing to do
+                }
             }
         }
     }
@@ -219,7 +224,8 @@ public class MediaTranscoderEngine {
         /**
          * Called to notify progress. Same thread which initiated transcode is used.
          *
-         * @param progress Progress in [0.0, 1.0] range, or negative value if progress is unknown.
+         * @param progress Progress in [0.0, 1.0] range, or negative value if progress
+         *                 is unknown.
          */
         void onProgress(double progress);
     }

@@ -50,7 +50,8 @@ public class MediaCodecListCompat {
         Iterator<MediaCodecInfo> iterator = new MediaCodecInfoIterator();
         while (iterator.hasNext()) {
             MediaCodecInfo codecInfo = iterator.next();
-            if (codecInfo.isEncoder() != findEncoder) continue;
+            if (codecInfo.isEncoder() != findEncoder)
+                continue;
             if (Arrays.asList(codecInfo.getSupportedTypes()).contains(mimeType)) {
                 return codecInfo.getName();
             }

@@ -35,8 +35,8 @@ public class PassThroughTrackTranscoder implements TrackTranscoder {
     private MediaFormat mActualOutputFormat;
     private long mWrittenPresentationTimeUs;
 
-    public PassThroughTrackTranscoder(MediaExtractor extractor, int trackIndex,
-                                      QueuedMuxer muxer, QueuedMuxer.SampleType sampleType) {
+    public PassThroughTrackTranscoder(MediaExtractor extractor, int trackIndex, QueuedMuxer muxer,
+            QueuedMuxer.SampleType sampleType) {
         mExtractor = extractor;
         mTrackIndex = trackIndex;
         mMuxer = muxer;
@@ -60,7 +60,8 @@ public class PassThroughTrackTranscoder implements TrackTranscoder {
     @SuppressLint("Assert")
     @Override
     public boolean stepPipeline() {
-        if (mIsEOS) return false;
+        if (mIsEOS)
+            return false;
         int trackIndex = mExtractor.getSampleTrackIndex();
         if (trackIndex < 0) {
             mBuffer.clear();
@@ -69,7 +70,8 @@ public class PassThroughTrackTranscoder implements TrackTranscoder {
             mIsEOS = true;
             return true;
         }
-        if (trackIndex != mTrackIndex) return false;
+        if (trackIndex != mTrackIndex)
+            return false;
 
         mBuffer.clear();
         int sampleSize = mExtractor.readSampleData(mBuffer, 0);

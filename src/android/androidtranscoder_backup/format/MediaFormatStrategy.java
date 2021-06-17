@@ -24,7 +24,8 @@ public interface MediaFormatStrategy {
      *
      * @param inputFormat MediaFormat from MediaExtractor, contains csd-0/csd-1.
      * @return null for passthrough.
-     * @throws OutputFormatUnavailableException if input could not be transcoded because of restrictions.
+     * @throws OutputFormatUnavailableException if input could not be transcoded
+     *                                          because of restrictions.
      */
     public MediaFormat createVideoOutputFormat(MediaFormat inputFormat);
 
@@ -32,7 +33,8 @@ public interface MediaFormatStrategy {
      * Caution: this method should return null currently.
      *
      * @return null for passthrough.
-     * @throws OutputFormatUnavailableException if input could not be transcoded because of restrictions.
+     * @throws OutputFormatUnavailableException if input could not be transcoded
+     *                                          because of restrictions.
      */
     public MediaFormat createAudioOutputFormat(MediaFormat inputFormat);
 

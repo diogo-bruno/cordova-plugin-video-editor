@@ -49,26 +49,29 @@ public class QueuedMuxer {
 
     public void setOutputFormat(SampleType sampleType, MediaFormat format) {
         switch (sampleType) {
-            case VIDEO:
-                mVideoFormat = format;
-                break;
-            case AUDIO:
-                mAudioFormat = format;
-                break;
-            default:
-                throw new AssertionError();
+        case VIDEO:
+            mVideoFormat = format;
+            break;
+        case AUDIO:
+            mAudioFormat = format;
+            break;
+        default:
+            throw new AssertionError();
         }
         onSetOutputFormat();
     }
 
     private void onSetOutputFormat() {
-        if (mVideoFormat == null || mAudioFormat == null) return;
+        if (mVideoFormat == null || mAudioFormat == null)
+            return;
         mListener.onDetermineOutputFormat();
 
         mVideoTrackIndex = mMuxer.addTrack(mVideoFormat);
-        Log.v(TAG, "Added track #" + mVideoTrackIndex + " with " + mVideoFormat.getString(MediaFormat.KEY_MIME) + " to muxer");
+        Log.v(TAG, "Added track #" + mVideoTrackIndex + " with " + mVideoFormat.getString(MediaFormat.KEY_MIME)
+                + " to muxer");
         mAudioTrackIndex = mMuxer.addTrack(mAudioFormat);
-        Log.v(TAG, "Added track #" + mAudioTrackIndex + " with " + mAudioFormat.getString(MediaFormat.KEY_MIME) + " to muxer");
+        Log.v(TAG, "Added track #" + mAudioTrackIndex + " with " + mAudioFormat.getString(MediaFormat.KEY_MIME)
+                + " to muxer");
         mMuxer.start();
         mStarted = true;
 
@@ -76,8 +79,8 @@ public class QueuedMuxer {
             mByteBuffer = ByteBuffer.allocate(0);
         }
         mByteBuffer.flip();
-        Log.v(TAG, "Output format determined, writing " + mSampleInfoList.size() +
-                " samples / " + mByteBuffer.limit() + " bytes to muxer.");
+        Log.v(TAG, "Output format determined, writing " + mSampleInfoList.size() + " samples / " + mByteBuffer.limit()
+                + " bytes to muxer.");
         MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
         int offset = 0;
         for (SampleInfo sampleInfo : mSampleInfoList) {
@@ -105,16 +108,18 @@ public class QueuedMuxer {
 
     private int getTrackIndexForSampleType(SampleType sampleType) {
         switch (sampleType) {
-            case VIDEO:
-                return mVideoTrackIndex;
-            case AUDIO:
-                return mAudioTrackIndex;
-            default:
-                throw new AssertionError();
+        case VIDEO:
+            return mVideoTrackIndex;
+        case AUDIO:
+            return mAudioTrackIndex;
+        default:
+            throw new AssertionError();
         }
     }
 
-    public enum SampleType {VIDEO, AUDIO}
+    public enum SampleType {
+        VIDEO, AUDIO
+    }
 
     private static class SampleInfo {
         private final SampleType mSampleType;
