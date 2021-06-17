@@ -22,7 +22,7 @@ import android.media.MediaMuxer;
 import android.os.Build;
 import android.util.Log;
 
-import org.apache.cordova.videoeditor.androidtranscoder.BuildConfig;
+//import org.apache.cordova.videoeditor.androidtranscoder.BuildConfig;
 import org.apache.cordova.videoeditor.androidtranscoder.format.MediaFormatStrategy;
 import org.apache.cordova.videoeditor.androidtranscoder.utils.ISO6709LocationParser;
 import org.apache.cordova.videoeditor.androidtranscoder.utils.MediaExtractorUtils;
